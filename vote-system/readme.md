@@ -97,6 +97,23 @@ sequenceDiagram
   end
 ```
 
+## Simple diagram of the idea
+
+[User authenticates]  
+        │  
+        ▼  
+[System generates a unique voter_id]  
+        │  
+        ▼  
+[User submits vote with voter_id]  
+        │  
+        ▼  
+[Database checks: does a vote with (voter_id, election_id) already exist?]  
+     ├── No → record vote  
+     └── Yes → reject (already_voted)
+
+
+
 ---
 
 ## 7. Summary of Safeguards
