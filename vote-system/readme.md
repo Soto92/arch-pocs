@@ -76,6 +76,8 @@ This is the strongest possible guarantee.
 - `voter_identities`
 - `votes`
 
+---
+
 # 🗳️ Database Model
 
 ## 1. ERD (Updated)
@@ -221,8 +223,6 @@ sequenceDiagram
   end
 ```
 
----
-
 # Final Summary
 
 ### **1. One real person → One global voter_id**
@@ -242,9 +242,11 @@ Only 4 tables remain.
 Personal data stays only in USERS.
 Voting data uses only `voter_id`.
 
+---
+
 # Data Sharding tradeoffs
 
-# **1. No Sharding (worst)**
+# **1. No Sharding**
 
 **Description:** All votes stored in one table, one database.
 
