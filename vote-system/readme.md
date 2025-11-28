@@ -241,3 +241,141 @@ Only 4 tables remain.
 
 Personal data stays only in USERS.
 Voting data uses only `voter_id`.
+
+# Data Sharding tradeoffs
+
+# **1. No Sharding (worst)**
+
+**Description:** All votes stored in one table, one database.
+
+**Pros:**
+
+- Extremely simple
+- No routing layer
+- Easy to manage
+
+**Cons (why it’s the worst):**
+
+- Does NOT scale under heavy write load
+- Single point of failure
+- Giant table becomes slow
+- Not viable for millions of voters
+
+**Best for:**
+
+- Prototypes, tiny apps
+
+---
+
+# **4. Shard by City / Region**
+
+**Description:** Each state/city/region gets its own partition or database.
+
+**Pros:**
+
+- Works if your voting is strongly tied to geography
+- Can simplify regional audits
+
+**Cons:**
+
+- Creates **hotspots** (big cities overload their shard)
+- Users move → routing complexity
+- Rebalancing cities is painful
+
+**Best for:**
+
+- Government-style regional elections
+- Not ideal for global/online vote apps
+
+---
+
+# **3. Shard by voter_id Range**
+
+**Description:** You pre-define ranges:
+
+- 0–10M → shard A
+- 10M–20M → shard B
+- etc.
+
+**Pros:**
+
+- Easy to implement
+- Linear scaling
+- Predictable routing
+
+**Cons:**
+
+- If voter_id is sequential → hotspot on latest range
+- Hard to rebalance ranges later
+- Requires random/UUID IDs for even distribution
+
+**Best for:**
+
+- Systems where you control ID generation
+- Medium scale
+
+---
+
+# **2. Shard by Consistent Hash (hash(voter_id))**
+
+**Description:** A distributed hash function maps user IDs to shards.
+
+**Pros:**
+
+- Excellent load distribution
+- No hotspots
+- Easy to add/remove shards with minimal data movement
+- Used by high-scale companies (Twitter, Discord, Uber)
+
+**Cons:**
+
+- Requires routing layer
+- Slightly more complex than ranges
+
+**Best for:**
+
+- Any large-scale vote system
+- Millions of concurrent users
+
+---
+
+# **1. Sharding by Poll/Event + Internal Hash (best)**
+
+**Description:** Partition by **poll_id** first, then distribute inside the poll using hashing or ranges.
+
+Example:
+
+- Poll A → shards 1, 2
+- Poll B → shards 3, 4
+- Poll C → shard 5
+
+**Pros (why it’s the best):**
+
+- Maximum scalability
+- Each vote event grows independently
+- Prevents “giant global tables”
+- Old events can be archived easily
+- Extremely high write throughput
+
+**Cons:**
+
+- Adds complexity in application routing
+- Requires a poll-level metadata layer
+
+**Best for:**
+
+- High-volume online voting
+- Apps like Instagram polls, YouTube polls, Big Brother voting
+- Systems with multiple simultaneous polls
+
+---
+
+# **🏁 Final Ranking: Worst → Best**
+
+| Rank          | Strategy                           | Score |
+| ------------- | ---------------------------------- | ----- |
+| **5 (worst)** | No Sharding                        | ❌    |
+| **4**         | Shard by City                      | ⚠️    |
+| **3**         | Shard by Range                     | 👍    |
+| **2**         | Shard by Hash (Consistent Hashing) | ⭐    |
+| **1 (best)**  | Shard by Poll + Hash               | 🏆    |
