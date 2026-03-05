@@ -10,7 +10,8 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <flink.version>1.14.4</flink.version>
+        <flink.version>1.17.2</flink.version>
+        <openlineage.version>1.9.0</openlineage.version>
     </properties>
 
     <dependencies>
@@ -24,15 +25,17 @@
             <artifactId>flink-streaming-java</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-cep</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.openlineage</groupId>
-            <artifactId>openlineage-flink</artifactId>
-            <version>0.10.0</version>
+            <artifactId>openlineage-flink-1.17</artifactId>
+            <version>${openlineage.version}</version>
         </dependency>
     </dependencies>
 
