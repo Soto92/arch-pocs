@@ -8,6 +8,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -23,18 +27,23 @@ public class IngestionJob {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String topic;
     private final Path inbox;
+    private final String usersUrl;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
     private final Set<String> processedFiles = new HashSet<>();
+    private final Set<String> processedUsers = new HashSet<>();
 
     public IngestionJob(
             JdbcTemplate jdbcTemplate,
             KafkaTemplate<String, String> kafkaTemplate,
             @Value("${pipeline.kafka.topic}") String topic,
-            @Value("${pipeline.files.inbox}") String inbox
+            @Value("${pipeline.files.inbox}") String inbox,
+            @Value("${pipeline.ws.users-url}") String usersUrl
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.kafkaTemplate = kafkaTemplate;
         this.topic = topic;
         this.inbox = Path.of(inbox);
+        this.usersUrl = usersUrl;
     }
 
     @Scheduled(fixedDelayString = "${pipeline.ingestion.interval-ms:30000}")
@@ -135,6 +144,42 @@ public class IngestionJob {
     }
 
     private void ingestWsPlaceholder() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(usersUrl))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                return;
+            }
+
+            var root = objectMapper.readTree(response.body());
+            if (!root.isArray()) {
+                return;
+            }
+
+            for (var node : root) {
+                String id = node.path("id").asText();
+                if (id.isBlank() || processedUsers.contains(id)) {
+                    continue;
+                }
+                String city = node.path("address").path("city").asText("Unknown");
+                String salesman = node.path("name").asText("Unknown");
+                double amount = 100.0 + (node.path("id").asDouble() * 37.5);
+                SaleEvent event = new SaleEvent(
+                        "ws-" + id,
+                        city,
+                        salesman,
+                        amount,
+                        Instant.now().toString(),
+                        "ws-users-api"
+                );
+                publish(event);
+                processedUsers.add(id);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     private void publish(SaleEvent event) {

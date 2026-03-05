@@ -33,7 +33,7 @@ create table if not exists top_salesman_country (
 
 insert into sales_source(sale_id, city, salesman, amount, event_time, published) values
 ('db-1','Sao Paulo','Ana',1200.50,now() - interval '4 minute',false),
-('db-2','Rio de Janeiro','Bruno',900.00,now() - interval '3 minute',false),
-('db-3','Sao Paulo','Carlos',1600.00,now() - interval '2 minute',false),
+('db-2','Rio de Janeiro','Pietro',900.00,now() - interval '3 minute',false),
+('db-3','Sao Paulo','Rafael',1600.00,now() - interval '2 minute',false),
 ('db-4','Curitiba','Ana',700.00,now() - interval '1 minute',false)
 on conflict (sale_id) do nothing;

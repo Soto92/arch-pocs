@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Ana (WS)",
+    "address": {
+      "city": "Sao Paulo"
+    }
+  },
+  {
+    "id": 2,
+    "name": "Bruno (WS)",
+    "address": {
+      "city": "Rio de Janeiro"
+    }
+  },
+  {
+    "id": 3,
+    "name": "Carla (WS)",
+    "address": {
+      "city": "Curitiba"
+    }
+  }
+]

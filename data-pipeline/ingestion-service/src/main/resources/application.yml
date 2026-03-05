@@ -19,6 +19,8 @@ pipeline:
     topic: sales.raw
   files:
     inbox: data/inbox
+  ws:
+    users-url: http://localhost:8088/users
   ingestion:
     interval-ms: 30000
 

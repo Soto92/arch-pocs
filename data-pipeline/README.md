@@ -57,6 +57,7 @@ Health check:
 - Marquez API/UI (`localhost:5000`)
 - Prometheus (`localhost:9090`)
 - Grafana (`localhost:3000`)
+- Mock Users API (`localhost:8088/users`)
 
 ## Run
 
@@ -95,6 +96,12 @@ Aggregation tables:
 - `top_sales_per_city`
 - `salesman_totals`
 - `top_salesman_country`
+
+## Source Customization
+
+- Relational source: edit rows in `sales_source` table.
+- File source: add/edit files in `data/inbox`.
+- Users API source: edit `data/mock-api/__files/users-response.json`.
 
 ## Observability
 
