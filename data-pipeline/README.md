@@ -1,8 +1,8 @@
-# Data Pipeline Project
+# Data Pipeline
 
-This project implements a modern data pipeline to process data from multiple sources and provide aggregated results through an API.
+Monorepo with Java 17 + Maven 3.9.12 for a multi-source ingestion pipeline, Kafka Streams processing, PostgreSQL aggregated storage, and API delivery.
 
-## Challenge
+## From Challenge
 
 create a modern data pipeline with:
 
@@ -16,50 +16,89 @@ create a modern data pipeline with:
 - The final Aggregated results must be in a dedicated DB and API
 - restrictions: Python, Red-shift, Hadoop.
 
-## Architecture Diagram
+## Stack
 
+- Java 17
+- Maven 3.9.12
+- Spring Boot 3.3.x
+- PostgreSQL
+- Kafka + Kafka Streams
+- Apache CXF
+- OpenLineage/Marquez
+- Prometheus + Grafana
+
+## Modules
+
+- `ingestion-service`: reads relational data and files, publishes normalized events to Kafka topic `sales.raw`.
+- `processing-service`: consumes events, computes ranking aggregates, writes tables in PostgreSQL.
+- `api-service`: exposes HTTP endpoints for final rankings.
+
+## Endpoints
+
+- `GET /api/top-sales-per-city`
+- `GET /api/top-salesman-country`
+
+### Complete endpoints:
+
+- http://localhost:8080/api/top-sales-per-city
+- http://localhost:8080/api/top-salesman-country
+
+Health check:
+
+- http://localhost:8080/actuator/health
+
+## Infra
+
+`docker-compose.yml` starts:
+
+- PostgreSQL (`localhost:5432`)
+- Zookeeper (`localhost:2181`)
+- Kafka (`localhost:9092`)
+- Marquez API/UI (`localhost:5000`)
+- Prometheus (`localhost:9090`)
+- Grafana (`localhost:3000`)
+
+## Run
+
+1. Start infra:
+   ```bash
+   docker compose up -d
+   ```
+2. Build all modules:
+   ```bash
+   mvn clean package
+   ```
+3. Start services in separate terminals:
+   ```bash
+   mvn -pl ingestion-service spring-boot:run
+   mvn -pl processing-service spring-boot:run
+   mvn -pl api-service spring-boot:run
+   ```
+
+## Run With One Command
+
+```powershell
+.\start-all.ps1
 ```
-                +-------------------+
-                |   Relational DB   |
-                |   (PostgreSQL)    |
-                +---------+---------+
-                          |
-                          |
-                          v
-+--------------+    +-------------+      +------------------+
-| File System  | -> | Ingestion   | ---> | Kafka (Optional) |
-| CSV / JSON   |    | Services    |      | Event Bus        |
-+--------------+    +-------------+      +--------+---------+
-                          |                        |
-                          v                        v
-                   +--------------------------------------+
-                   |   Processing Layer (Apache Spark)    |
-                   |                                      |
-                   | Pipeline 1: Top Sales per City       |
-                   | Pipeline 2: Top Salesman Country     |
-                   +-------------------+------------------+
-                                       |
-                                       v
-                             +------------------+
-                             | Hadoop / DataLake|
-                             | (Raw / Processed)|
-                             +---------+--------+
-                                       |
-                                       v
-                                +-------------+
-                                |  Redshift   |
-                                | Aggregation |
-                                +------+------+
-                                       |
-                                       v
-                                 +-----------+
-                                 |   API     |
-                                 | SpringBoot|
-                                 +-----------+
 
-Monitoring / Observability:
-Prometheus + Grafana
+## Data Model
 
-Lineage:
-OpenLineage / Marquez
-```
+Init script: `infra/postgres/init.sql`
+
+Input source table:
+
+- `sales_source(sale_id, city, salesman, amount, event_time, published)`
+
+Aggregation tables:
+
+- `city_sales_totals`
+- `top_sales_per_city`
+- `salesman_totals`
+- `top_salesman_country`
+
+## Observability
+
+Each service exposes:
+
+- `/actuator/health`
+- `/actuator/prometheus`

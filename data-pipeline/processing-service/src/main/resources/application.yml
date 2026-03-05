@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: processing-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pipeline
+    username: pipeline
+    password: pipeline
+  kafka:
+    bootstrap-servers: localhost:9092
+    streams:
+      application-id: sales-processing-app
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        commit.interval.ms: 2000
+        processing.guarantee: at_least_once
+
+pipeline:
+  kafka:
+    topic: sales.raw
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

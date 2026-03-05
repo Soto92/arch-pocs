@@ -1,0 +1,16 @@
+[
+  {
+    "saleId": "json-1",
+    "city": "Fortaleza",
+    "salesman": "Elisa",
+    "amount": 990.0,
+    "eventTime": "2026-03-05T10:10:00Z"
+  },
+  {
+    "saleId": "json-2",
+    "city": "Fortaleza",
+    "salesman": "Ana",
+    "amount": 120.0,
+    "eventTime": "2026-03-05T10:15:00Z"
+  }
+]

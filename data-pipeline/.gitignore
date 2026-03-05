@@ -1,0 +1,53 @@
+# Build outputs
+target/
+build/
+out/
+dist/
+tmp/
+temp/
+
+# Java artifacts
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.jpi
+*.hprof
+
+# Logs
+*.log
+logs/
+
+# Maven
+.mvn/timing.properties
+dependency-reduced-pom.xml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test and coverage
+coverage/
+.coverage
+*.lcov
+
+# Docker local overrides
+docker-compose.override.yml
