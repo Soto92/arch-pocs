@@ -4,14 +4,14 @@ create table if not exists sales_source (
     salesman varchar(120) not null,
     amount numeric(12,2) not null,
     event_time timestamp not null,
-    source varchar(8) not null default 'DB',
+    source varchar(32) not null default 'DB',
     published boolean not null default false
 );
 
 create table if not exists city_sales_totals (
     city varchar(120) not null,
     salesman varchar(120) not null,
-    source varchar(8) not null,
+    source varchar(32) not null,
     total_amount numeric(14,2) not null,
     primary key (city, salesman, source)
 );
@@ -19,13 +19,13 @@ create table if not exists city_sales_totals (
 create table if not exists top_sales_per_city (
     city varchar(120) primary key,
     salesman varchar(120) not null,
-    source varchar(8) not null,
+    source varchar(32) not null,
     total_amount numeric(14,2) not null
 );
 
 create table if not exists salesman_totals (
     salesman varchar(120) not null,
-    source varchar(8) not null,
+    source varchar(32) not null,
     primary key (salesman, source),
     total_amount numeric(14,2) not null
 );
@@ -33,7 +33,7 @@ create table if not exists salesman_totals (
 create table if not exists top_salesman_country (
     id int primary key,
     salesman varchar(120) not null,
-    source varchar(8) not null,
+    source varchar(32) not null,
     total_amount numeric(14,2) not null
 );
 

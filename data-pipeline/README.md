@@ -46,6 +46,12 @@ create a modern data pipeline with:
 Health check:
 
 - http://localhost:8080/actuator/health
+- http://localhost:8081/actuator/health
+- http://localhost:8082/actuator/health
+
+Marquez API/UI:
+
+- http://localhost:5000/api/v1/namespaces
 
 ## Infra
 
@@ -80,6 +86,12 @@ Health check:
 
 ```powershell
 .\start-all.ps1
+```
+
+## Reprocess Pipeline
+
+```powershell
+.\reprocess-all.ps1
 ```
 
 ## Data Model
