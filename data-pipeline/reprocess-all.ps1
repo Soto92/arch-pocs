@@ -32,7 +32,7 @@ set source = 'DB',
 docker exec pipeline-postgres psql -U pipeline -d pipeline -c $sql | Out-Null
 
 Get-CimInstance Win32_Process |
-    Where-Object { $_.Name -like "java*" -and ($_.CommandLine -like "*ingestion-service*" -or $_.CommandLine -like "*processing-service*" -or $_.CommandLine -like "*api-service*") } |
+    Where-Object { $_.Name -like "java*" -and ($_.CommandLine -like "*com.example.ingestion.IngestionApplication*" -or $_.CommandLine -like "*com.example.processing.ProcessingApplication*" -or $_.CommandLine -like "*com.example.api.ApiApplication*") } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 
 Get-ChildItem "$env:TEMP\\kafka-streams\\sales-processing-app*" -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue

@@ -134,6 +134,8 @@ Final endpoint payloads also include `source`.
 
 ## Observability
 
+### Graphana
+
 Each service exposes:
 
 - `/actuator/health`
