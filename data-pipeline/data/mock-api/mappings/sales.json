@@ -1,13 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/users"
+    "urlPath": "/sales"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "users-response.json"
+    "bodyFileName": "sales-response.json"
   }
 }

@@ -2,22 +2,17 @@
   {
     "saleId": "json-1",
     "city": "Fortaleza",
-    "salesman": "John",
+    "salesman": "Elisa",
     "amount": 990.0,
-    "eventTime": "2026-03-05T10:10:00Z"
-  },
-  {
-    "saleId": "json-1",
-    "city": "Fortaleza",
-    "salesman": "Maria da Penha",
-    "amount": 990.0,
-    "eventTime": "2026-03-05T10:10:00Z"
+    "eventTime": "2026-03-05T10:10:00Z",
+    "source": "FS"
   },
   {
     "saleId": "json-2",
-    "city": "Fortaleza",
-    "salesman": "Adalberto",
-    "amount": 120.0,
-    "eventTime": "2026-03-05T10:15:00Z"
+    "city": "Quillota",
+    "salesman": "Mauricio",
+    "amount": 1120.0,
+    "eventTime": "2026-03-05T10:15:00Z",
+    "source": "FS"
   }
 ]

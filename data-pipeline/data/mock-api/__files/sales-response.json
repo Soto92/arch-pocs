@@ -1,0 +1,26 @@
+[
+  {
+    "saleId": "api-1",
+    "city": "Sao Paulo",
+    "salesman": "Ana",
+    "amount": 1100.0,
+    "eventTime": "2026-03-06T10:00:00Z",
+    "source": "WS"
+  },
+  {
+    "saleId": "api-2",
+    "city": "Rio de Janeiro",
+    "salesman": "Bruno",
+    "amount": 920.5,
+    "eventTime": "2026-03-06T10:05:00Z",
+    "source": "WS"
+  },
+  {
+    "saleId": "api-3",
+    "city": "Curitiba",
+    "salesman": "Carla",
+    "amount": 1300.0,
+    "eventTime": "2026-03-06T10:10:00Z",
+    "source": "WS"
+  }
+]

@@ -1,4 +1,4 @@
-city,salesman,amount,eventTime
-Recife,Diana,850.25,2026-03-03T10:00:00Z
-Recife,Bruno,400.00,2026-03-04T10:05:00Z
-Gravataí,Mauricio,900.00,2026-03-05T10:05:00Z
+saleId,city,salesman,amount,eventTime,source
+csv-1,Recife,Diana,850.25,2026-03-03T10:00:00Z,FS
+csv-2,Recife,Bruno,400.00,2026-03-04T10:05:00Z,FS
+csv-3,Gravataí,Mauricio,900.00,2026-03-05T10:05:00Z,FS
