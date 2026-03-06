@@ -57,7 +57,7 @@ Health check:
 - Marquez API/UI (`localhost:5000`)
 - Prometheus (`localhost:9090`)
 - Grafana (`localhost:3000`)
-- Mock Users API (`localhost:8088/users`)
+- Mock Sales API (`localhost:8088/sales`)
 
 ## Run
 
@@ -101,7 +101,24 @@ Aggregation tables:
 
 - Relational source: edit rows in `sales_source` table.
 - File source: add/edit files in `data/inbox`.
-- Users API source: edit `data/mock-api/__files/users-response.json`.
+- API source: edit `data/mock-api/__files/sales-response.json`.
+
+Unified sales schema for all sources:
+
+- `saleId`
+- `city`
+- `salesman`
+- `amount`
+- `eventTime`
+- `source`
+
+Source flag values:
+
+- `DB` for relational database sales
+- `FS` for file system sales
+- `WS` for API sales
+
+Final endpoint payloads also include `source`.
 
 ## Observability
 
