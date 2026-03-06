@@ -28,6 +28,7 @@ public class IngestionJob {
     private final String topic;
     private final Path inbox;
     private final String salesUrl;
+    private final LineageClient lineageClient;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final Set<String> processedFiles = new HashSet<>();
     private final Set<String> processedApiSales = new HashSet<>();
@@ -35,12 +36,14 @@ public class IngestionJob {
     public IngestionJob(
             JdbcTemplate jdbcTemplate,
             KafkaTemplate<String, String> kafkaTemplate,
+            LineageClient lineageClient,
             @Value("${pipeline.kafka.topic}") String topic,
             @Value("${pipeline.files.inbox}") String inbox,
             @Value("${pipeline.api.sales-url}") String salesUrl
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.kafkaTemplate = kafkaTemplate;
+        this.lineageClient = lineageClient;
         this.topic = topic;
         this.inbox = Path.of(inbox);
         this.salesUrl = salesUrl;
@@ -48,9 +51,16 @@ public class IngestionJob {
 
     @Scheduled(fixedDelayString = "${pipeline.ingestion.interval-ms:30000}")
     public void run() {
-        ingestDatabase();
-        ingestFiles();
-        ingestApiSales();
+        String runId = UUID.randomUUID().toString();
+        lineageClient.emitStart("ingestion-cycle", runId);
+        try {
+            ingestDatabase();
+            ingestFiles();
+            ingestApiSales();
+            lineageClient.emitComplete("ingestion-cycle", runId);
+        } catch (Exception e) {
+            lineageClient.emitFail("ingestion-cycle", runId);
+        }
     }
 
     private void ingestDatabase() {

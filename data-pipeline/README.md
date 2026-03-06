@@ -140,3 +140,27 @@ Each service exposes:
 
 - `/actuator/health`
 - `/actuator/prometheus`
+
+## Lineage
+
+Lineage events are emitted to Marquez using OpenLineage-compatible payloads.
+
+Marquez base URL:
+
+- `http://localhost:5000`
+
+Namespace:
+
+- `data-pipeline`
+
+Tracked jobs:
+
+- `ingestion-cycle`
+- `processing-stream`
+
+Useful lineage endpoints:
+
+- `GET http://localhost:5000/api/v1/namespaces/data-pipeline/jobs`
+- `GET http://localhost:5000/api/v1/namespaces/data-pipeline/jobs/ingestion-cycle/runs`
+- `GET http://localhost:5000/api/v1/namespaces/data-pipeline/jobs/processing-stream/runs`
+- `GET http://localhost:5000/api/v1/runs/{runId}`

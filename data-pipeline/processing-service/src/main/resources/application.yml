@@ -21,6 +21,10 @@ spring:
 pipeline:
   kafka:
     topic: sales.raw
+  lineage:
+    enabled: true
+    endpoint: http://localhost:5000/api/v1/lineage
+    namespace: data-pipeline
 
 management:
   endpoints:
