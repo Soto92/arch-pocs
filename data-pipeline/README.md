@@ -136,6 +136,8 @@ Final endpoint payloads also include `source`.
 
 ### Graphana
 
+<img width="1903" height="943" alt="Captura de tela 2026-03-06 121318" src="https://github.com/user-attachments/assets/af2732ad-d90a-4d15-9b59-c143d42e839c" />
+
 Each service exposes:
 
 - `/actuator/health`
