@@ -27,36 +27,36 @@ public class IngestionJob {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String topic;
     private final Path inbox;
-    private final String usersUrl;
+    private final String salesUrl;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final Set<String> processedFiles = new HashSet<>();
-    private final Set<String> processedUsers = new HashSet<>();
+    private final Set<String> processedApiSales = new HashSet<>();
 
     public IngestionJob(
             JdbcTemplate jdbcTemplate,
             KafkaTemplate<String, String> kafkaTemplate,
             @Value("${pipeline.kafka.topic}") String topic,
             @Value("${pipeline.files.inbox}") String inbox,
-            @Value("${pipeline.ws.users-url}") String usersUrl
+            @Value("${pipeline.api.sales-url}") String salesUrl
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.kafkaTemplate = kafkaTemplate;
         this.topic = topic;
         this.inbox = Path.of(inbox);
-        this.usersUrl = usersUrl;
+        this.salesUrl = salesUrl;
     }
 
     @Scheduled(fixedDelayString = "${pipeline.ingestion.interval-ms:30000}")
     public void run() {
         ingestDatabase();
         ingestFiles();
-        ingestWsPlaceholder();
+        ingestApiSales();
     }
 
     private void ingestDatabase() {
         List<SaleEvent> events = jdbcTemplate.query(
                 """
-                select sale_id, city, salesman, amount, event_time
+                select sale_id, city, salesman, amount, event_time, source
                 from sales_source
                 where published = false
                 order by event_time asc
@@ -68,7 +68,7 @@ public class IngestionJob {
                         rs.getString("salesman"),
                         rs.getDouble("amount"),
                         rs.getTimestamp("event_time").toInstant().toString(),
-                        "relational-db"
+                        rs.getString("source") == null || rs.getString("source").isBlank() ? "DB" : rs.getString("source")
                 )
         );
 
@@ -106,16 +106,16 @@ public class IngestionJob {
             List<String> lines = Files.readAllLines(file);
             for (int i = 1; i < lines.size(); i++) {
                 String[] cols = lines.get(i).split(",");
-                if (cols.length < 4) {
+                if (cols.length < 5) {
                     continue;
                 }
                 SaleEvent event = new SaleEvent(
-                        UUID.randomUUID().toString(),
-                        cols[0].trim(),
+                        cols[0].trim().isBlank() ? UUID.randomUUID().toString() : cols[0].trim(),
                         cols[1].trim(),
-                        Double.parseDouble(cols[2].trim()),
-                        cols[3].trim(),
-                        "file-csv"
+                        cols[2].trim(),
+                        Double.parseDouble(cols[3].trim()),
+                        cols[4].trim(),
+                        cols.length >= 6 && !cols[5].trim().isBlank() ? cols[5].trim() : "FS"
                 );
                 publish(event);
             }
@@ -134,7 +134,7 @@ public class IngestionJob {
                             node.path("salesman").asText(),
                             node.path("amount").asDouble(),
                             node.path("eventTime").asText(Instant.now().toString()),
-                            "file-json"
+                            node.path("source").asText("FS")
                     );
                     publish(event);
                 }
@@ -143,10 +143,10 @@ public class IngestionJob {
         }
     }
 
-    private void ingestWsPlaceholder() {
+    private void ingestApiSales() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(usersUrl))
+                    .uri(URI.create(salesUrl))
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -160,23 +160,20 @@ public class IngestionJob {
             }
 
             for (var node : root) {
-                String id = node.path("id").asText();
-                if (id.isBlank() || processedUsers.contains(id)) {
+                String saleId = node.path("saleId").asText();
+                if (saleId.isBlank() || processedApiSales.contains(saleId)) {
                     continue;
                 }
-                String city = node.path("address").path("city").asText("Unknown");
-                String salesman = node.path("name").asText("Unknown");
-                double amount = 100.0 + (node.path("id").asDouble() * 37.5);
                 SaleEvent event = new SaleEvent(
-                        "ws-" + id,
-                        city,
-                        salesman,
-                        amount,
-                        Instant.now().toString(),
-                        "ws-users-api"
+                        saleId,
+                        node.path("city").asText(),
+                        node.path("salesman").asText(),
+                        node.path("amount").asDouble(),
+                        node.path("eventTime").asText(Instant.now().toString()),
+                        node.path("source").asText("WS")
                 );
                 publish(event);
-                processedUsers.add(id);
+                processedApiSales.add(saleId);
             }
         } catch (Exception ignored) {
         }

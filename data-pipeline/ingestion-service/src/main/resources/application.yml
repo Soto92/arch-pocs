@@ -18,9 +18,9 @@ pipeline:
   kafka:
     topic: sales.raw
   files:
-    inbox: data/inbox
-  ws:
-    users-url: http://localhost:8088/users
+    inbox: ../data/inbox
+  api:
+    sales-url: http://localhost:8088/sales
   ingestion:
     interval-ms: 30000
 

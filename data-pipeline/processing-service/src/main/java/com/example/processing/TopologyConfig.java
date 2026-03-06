@@ -28,7 +28,22 @@ public class TopologyConfig {
 
         KStream<String, SaleEvent> sales = raw.flatMapValues(this::parse);
 
-        sales.selectKey((k, v) -> v.city() + "|" + v.salesman())
+        sales.selectKey((k, v) -> v.city() + "|" + v.salesman() + "|" + v.source())
+                .groupByKey(Grouped.with(Serdes.String(), Serdes.serdeFrom(new SaleEventSerializer(), new SaleEventDeserializer())))
+                .aggregate(
+                        () -> 0.0,
+                        (key, value, aggregate) -> aggregate + value.amount(),
+                        Materialized.with(Serdes.String(), Serdes.Double())
+                )
+                .toStream()
+                .foreach((key, total) -> {
+                    String[] parts = key.split("\\|", 3);
+                    if (parts.length == 3) {
+                        repository.upsertCitySalesTotal(parts[0], parts[1], parts[2], total);
+                    }
+                });
+
+        sales.selectKey((k, v) -> v.salesman() + "|" + v.source())
                 .groupByKey(Grouped.with(Serdes.String(), Serdes.serdeFrom(new SaleEventSerializer(), new SaleEventDeserializer())))
                 .aggregate(
                         () -> 0.0,
@@ -39,19 +54,9 @@ public class TopologyConfig {
                 .foreach((key, total) -> {
                     String[] parts = key.split("\\|", 2);
                     if (parts.length == 2) {
-                        repository.upsertCitySalesTotal(parts[0], parts[1], total);
+                        repository.upsertSalesmanTotal(parts[0], parts[1], total);
                     }
                 });
-
-        sales.selectKey((k, v) -> v.salesman())
-                .groupByKey(Grouped.with(Serdes.String(), Serdes.serdeFrom(new SaleEventSerializer(), new SaleEventDeserializer())))
-                .aggregate(
-                        () -> 0.0,
-                        (key, value, aggregate) -> aggregate + value.amount(),
-                        Materialized.with(Serdes.String(), Serdes.Double())
-                )
-                .toStream()
-                .foreach(repository::upsertSalesmanTotal);
 
         return raw;
     }
