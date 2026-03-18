@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -32,15 +33,15 @@ public class LineageClient {
         this.producer = producer;
     }
 
-    public void emitStart(String jobName, String runId) {
-        emit("START", jobName, runId);
+    public void emitStart(String jobName, String runId, List<Map<String, Object>> inputs, List<Map<String, Object>> outputs) {
+        emit("START", jobName, runId, inputs, outputs);
     }
 
-    public void emitComplete(String jobName, String runId) {
-        emit("COMPLETE", jobName, runId);
+    public void emitComplete(String jobName, String runId, List<Map<String, Object>> inputs, List<Map<String, Object>> outputs) {
+        emit("COMPLETE", jobName, runId, inputs, outputs);
     }
 
-    private void emit(String eventType, String jobName, String runId) {
+    private void emit(String eventType, String jobName, String runId, List<Map<String, Object>> inputs, List<Map<String, Object>> outputs) {
         if (!enabled) {
             return;
         }
@@ -50,7 +51,9 @@ public class LineageClient {
                     "eventTime", Instant.now().toString(),
                     "run", Map.of("runId", runId),
                     "job", Map.of("namespace", namespace, "name", jobName),
-                    "producer", producer
+                    "producer", producer,
+                    "inputs", inputs,
+                    "outputs", outputs
             );
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(endpoint))

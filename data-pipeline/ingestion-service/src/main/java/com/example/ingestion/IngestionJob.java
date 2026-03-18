@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,12 +53,20 @@ public class IngestionJob {
     @Scheduled(fixedDelayString = "${pipeline.ingestion.interval-ms:30000}")
     public void run() {
         String runId = UUID.randomUUID().toString();
-        lineageClient.emitStart("ingestion-cycle", runId);
+        List<Map<String, Object>> inputs = List.of(
+                dataset("postgres", "pipeline.sales_source"),
+                dataset("filesystem", "data/inbox"),
+                dataset("http", salesUrl)
+        );
+        List<Map<String, Object>> outputs = List.of(
+                dataset("kafka", topic)
+        );
+        lineageClient.emitStart("ingestion-cycle", runId, inputs, outputs);
         try {
             ingestDatabase();
             ingestFiles();
             ingestApiSales();
-            lineageClient.emitComplete("ingestion-cycle", runId);
+            lineageClient.emitComplete("ingestion-cycle", runId, inputs, outputs);
         } catch (Exception e) {
             lineageClient.emitFail("ingestion-cycle", runId);
         }
@@ -194,5 +203,12 @@ public class IngestionJob {
             kafkaTemplate.send(topic, event.saleId(), objectMapper.writeValueAsString(event));
         } catch (Exception ignored) {
         }
+    }
+
+    private Map<String, Object> dataset(String namespace, String name) {
+        return Map.of(
+                "namespace", namespace,
+                "name", name
+        );
     }
 }

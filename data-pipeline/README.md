@@ -61,6 +61,7 @@ Marquez API/UI:
 - Zookeeper (`localhost:2181`)
 - Kafka (`localhost:9092`)
 - Marquez API/UI (`localhost:5000`)
+- Marquez Web UI (`localhost:3001`)
 - Prometheus (`localhost:9090`)
 - Grafana (`localhost:3000`)
 - Mock Sales API (`localhost:8088/sales`)
