@@ -148,6 +148,12 @@ Each service exposes:
 
 Lineage events are emitted to Marquez using OpenLineage-compatible payloads.
 
+<img width="1915" height="986" alt="Captura de tela 2026-03-18 161028" src="https://github.com/user-attachments/assets/c2422dd3-a486-478f-b745-44745fbe14f7" />
+
+Marquez Web UI URL:
+
+- `http://localhost:3001`
+
 Marquez base URL:
 
 - `http://localhost:5000`
