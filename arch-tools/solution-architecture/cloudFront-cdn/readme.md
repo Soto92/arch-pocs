@@ -1,11 +1,3 @@
-# CloudFront (CDN)
-
-```mermaid
-flowchart LR
-  U[Client] --> CDN[CloudFront (CDN)]
-  CDN --> O[Origin Server]
-```
-
 ## CloudFront (CDN)
 
 What it is:
