@@ -1,3 +1,81 @@
+# Cache Tier
+
+```mermaid
+flowchart LR
+  C[Client] --> A[Application API]
+  A --> T[Cache Tier]
+  T --> D[(Database)]
+  T --> A
+```
+
+This folder has two JavaScript cache demos:
+
+- `cache-tier.js`: a self-contained Node.js cache tier using an in-memory `Map`.
+- `redis-cache.js`: a cache-aside API that stores cached values in Redis.
+
+The cache tier demonstrates:
+
+- Fast reads from the cache when an item is hot.
+- Slower reads from a simulated database on cache misses.
+- TTL-based expiration.
+- Cache invalidation after writes.
+- Hit, miss, write, invalidation, and hit-ratio stats.
+
+## Run The Self-Contained Demo
+
+```powershell
+node .\solution-architecture\cache\cache-tier.js
+```
+
+## Try It
+
+First request reads from the simulated database and fills the cache:
+
+```powershell
+Invoke-RestMethod http://localhost:7071/products/sku-100
+```
+
+Second request reads from the cache:
+
+```powershell
+Invoke-RestMethod http://localhost:7071/products/sku-100
+```
+
+Inspect cache entries and stats:
+
+```powershell
+Invoke-RestMethod http://localhost:7071/cache
+```
+
+Update the product. This writes to the simulated database and invalidates the cached product:
+
+```powershell
+Invoke-RestMethod `
+  -Method Put `
+  -ContentType "application/json" `
+  -Body '{"price":29.9,"stock":35}' `
+  http://localhost:7071/products/sku-100
+```
+
+Delete one cached key:
+
+```powershell
+Invoke-RestMethod -Method Delete http://localhost:7071/cache/products%3Asku-100
+```
+
+Clear all cached entries:
+
+```powershell
+Invoke-RestMethod -Method Delete http://localhost:7071/cache
+```
+
+## Self-Contained Demo Environment Variables
+
+- `PORT`: API port. Default: `7071`.
+- `CACHE_TTL_SECONDS`: Cache TTL. Default: `20`.
+
+---
+
 # Simple Redis Cache
 
 ```mermaid
@@ -9,7 +87,7 @@ flowchart LR
   D --> A
 ```
 
-This demo implements a small cache-aside pattern:
+The Redis demo implements a small cache-aside pattern:
 
 - The API checks Redis first.
 - On a cache miss, it reads from a simulated database.
